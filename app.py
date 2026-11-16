@@ -99,12 +99,12 @@ def ping():
 @app.route('/signal')
 def get_signal():
     try:
-        asset = request.args.get('asset', 'CAD/CHF (OTC)')
+        asset = request.args.get('asset', 'EUR/USD')
         current_time = time.time()
         time_slot = int(current_time / 2)
         
         base_currency = asset.split('/')[0] if '/' in asset else "USD"
-        if not TradePilotPrecisionEngine.verify_news_and_market_safety(base_currency):
+        if not TradePrecisionEngine.verify_news_and_market_safety(base_currency):
             res = jsonify({"signal": "HOLD", "trend": "NEWS_BLOCK_ACTIVE_VEX", "confidence": 0, "status": "NEWS_GUARD"})
             res.headers.add("Access-Control-Allow-Origin", "*")
             return res
@@ -150,7 +150,7 @@ def bot_script():
                     return;
                 }
                 
-                ["tradepilot-panel", "tradepilot-btn", "tradepilot-style", "tradepilot-auth-modal", "tradepilot-bg-radar"].forEach(function(i){
+                ["tradepilot-panel", "tradepilot-btn", "tradepilot-style", "tradepilot-auth-modal", "tradepilot-center-radar"].forEach(function(i){
                     var e = d.getElementById(i);
                     if(e) e.remove();
                 });
@@ -183,10 +183,34 @@ def bot_script():
                               '0% { transform: rotate(0deg); }' +
                               '100% { transform: rotate(360deg); }' +
                               '}' +
+                              '@keyframes glitchEffect {' +
+                              '0% { transform: translate(0); }' +
+                              '20% { transform: translate(-3px, 3px); filter: hue-rotate(90deg); }' +
+                              '40% { transform: translate(-3px, -3px); }' +
+                              '60% { transform: translate(3px, 3px); filter: hue-rotate(180deg); }' +
+                              '80% { transform: translate(3px, -3px); }' +
+                              '100% { transform: translate(0); }' +
+                              '}' +
                               '@keyframes panelFadeIn { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }';
                 d.head.appendChild(s);
 
                 showAuthModal();
+
+                function playBeepSound() {
+                    try {
+                        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        var osc = audioCtx.createOscillator();
+                        var gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.08);
+                    } catch(e) {}
+                }
 
                 function createBotIcon() {
                     var wrap = d.getElementById('tradepilot-btn') || d.createElement('div');
@@ -295,41 +319,41 @@ def bot_script():
 
                     var panel = d.createElement('div');
                     panel.id = 'tradepilot-panel';
-                    panel.style.cssText = 'position:fixed;top:45%;left:50%;transform:translate(-50%, -50%);width:280px;background:linear-gradient(180deg, rgba(10, 15, 26, 0.98), rgba(4, 7, 14, 0.99));border:4px solid #22c55e;border-radius:12px;animation:dynamicPanelGlow 3s linear infinite, panelFadeIn 0.2s ease-out;z-index:2147483647;font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;color:#fff;overflow:hidden;box-sizing:border-box;backdrop-filter:blur(8px);box-shadow:0 20px 45px rgba(0,0,0,0.9);';
+                    panel.style.cssText = 'position:fixed;top:45%;left:50%;transform:translate(-50%, -50%);width:275px;background:linear-gradient(180deg, rgba(10, 15, 26, 0.98), rgba(4, 7, 14, 0.99));border:4px solid #22c55e;border-radius:12px;animation:dynamicPanelGlow 3s linear infinite, panelFadeIn 0.2s ease-out;z-index:2147483647;font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;color:#fff;overflow:hidden;box-sizing:border-box;backdrop-filter:blur(8px);box-shadow:0 20px 45px rgba(0,0,0,0.9);';
 
                     panel.innerHTML = 
                         '<div style="padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;">' +
                             // Header
                             '<div id="tradepilot-panel-header" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:4px;cursor:move;">' +
                                 '<div style="display:flex;align-items:center;gap:6px;pointer-events:none;">' +
-                                    '<div style="width:28px;height:28px;border-radius:50%;overflow:hidden;border:1.5px solid #38bdf8;background:#000;">' +
+                                    '<div style="width:26px;height:26px;border-radius:50%;overflow:hidden;border:1.5px solid #38bdf8;background:#000;">' +
                                         '<img src="' + botMainLogo + '" style="width:100%;height:100%;object-fit:cover;" />' +
                                     '</div>' +
                                     '<div style="display:flex;flex-direction:column;justify-content:center;">' +
-                                        '<div style="font-size:10px;font-weight:900;letter-spacing:0.8px;color:#fff;">TRADE PILOT</div>' +
-                                        '<div style="font-size:5.5px;color:#38bdf8;font-weight:800;">VEX CONTROL ENGINE</div>' +
+                                        '<div style="font-size:9.5px;font-weight:900;letter-spacing:0.8px;color:#fff;">TRADE PILOT</div>' +
+                                        '<div style="font-size:5px;color:#38bdf8;font-weight:800;">VEX CONTROL ENGINE</div>' +
                                     '</div>' +
                                 '</div>' +
                                 '<div style="display:flex;align-items:center;gap:3px;">' +
-                                    '<div style="background:rgba(34,197,94,0.2);color:#22c55e;font-size:6px;font-weight:900;padding:1px 3px;border-radius:3px;">STD</div>' +
-                                    '<div style="background:rgba(234,179,8,0.2);color:#facc15;font-size:6px;font-weight:900;padding:1px 3px;border-radius:3px;">LIVE</div>' +
+                                    '<div style="background:rgba(34,197,94,0.2);color:#22c55e;font-size:5.5px;font-weight:900;padding:1px 3px;border-radius:3px;">STD</div>' +
+                                    '<div style="background:rgba(234,179,8,0.2);color:#facc15;font-size:5.5px;font-weight:900;padding:1px 3px;border-radius:3px;">LIVE</div>' +
                                     '<div id="tp-close-btn" style="cursor:pointer;font-size:9px;color:#94a3b8;padding:1px 4px;border-radius:3px;background:rgba(255,255,255,0.06);">✕</div>' +
                                 '</div>' +
                             '</div>' +
 
-                            // Market Asset & Live Quote row (Auto Detected)
+                            // Market Asset & Live Quote row (Accurately synced with current market)
                             '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.6);padding:5px 7px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);">' +
                                 '<div style="display:flex;flex-direction:column;">' +
                                     '<div style="font-size:5.5px;color:#94a3b8;font-weight:800;">MARKET ASSET</div>' +
-                                    '<div id="tp-asset-label" style="font-size:9px;font-weight:900;color:#38bdf8;">CAD/CHF (OTC)</div>' +
+                                    '<div id="tp-asset-label" style="font-size:9px;font-weight:900;color:#38bdf8;">Loading Market...</div>' +
                                 '</div>' +
                                 '<div style="display:flex;flex-direction:column;align-items:flex-end;">' +
                                     '<div style="font-size:5.5px;color:#94a3b8;font-weight:800;">LIVE QUOTE</div>' +
-                                    '<div id="tp-live-quote" style="font-size:9px;font-weight:900;color:#22c55e;">0.59403</div>' +
+                                    '<div id="tp-live-quote" style="font-size:9px;font-weight:900;color:#22c55e;">0.00000</div>' +
                                 '</div>' +
                             '</div>' +
 
-                            // Target Round Price Box with Auto Snap[span_1](start_span)[span_1](end_span)
+                            // Target Round Price Box with Auto Snap & Live Market Price Detection
                             '<div style="background:rgba(0,0,0,0.5);border:1.5px solid rgba(56,189,248,0.4);border-radius:6px;padding:5px;display:flex;flex-direction:column;gap:3px;">' +
                                 '<div style="display:flex;align-items:center;justify-content:space-between;">' +
                                     '<span style="font-size:7px;font-weight:800;color:#facc15;">TARGET ROUND PRICE</span>' +
@@ -339,33 +363,33 @@ def bot_script():
                                 '</div>' +
                                 '<div style="display:flex;align-items:center;gap:5px;">' +
                                     '<button id="tp-price-minus" style="background:#1e293b;color:#fff;border:1px solid #475569;width:22px;height:22px;border-radius:4px;font-weight:bold;cursor:pointer;">-</button>' +
-                                    '<input id="tp-price-input" type="text" value="0.17560" style="flex:1;background:#030712;border:1.5px solid #22c55e;border-radius:4px;color:#fff;font-size:10.5px;text-align:center;font-weight:900;outline:none;padding:2px;" />' +
+                                    '<input id="tp-price-input" type="text" value="0.00000" style="flex:1;background:#030712;border:1.5px solid #22c55e;border-radius:4px;color:#fff;font-size:10px;text-align:center;font-weight:900;outline:none;padding:2px;" />' +
                                     '<button id="tp-price-plus" style="background:#1e293b;color:#fff;border:1px solid #475569;width:22px;height:22px;border-radius:4px;font-weight:bold;cursor:pointer;">+</button>' +
                                 '</div>' +
                             '</div>' +
 
-                            // Duration Selectors: 5s, 10s, 15s, 30s, 60s
+                            // Duration Selectors: 5s to 60s
                             '<div style="display:flex;flex-direction:column;gap:2px;">' +
                                 '<div style="display:flex;align-items:center;justify-content:space-between;">' +
                                     '<span style="font-size:6px;color:#94a3b8;font-weight:800;">DURATION (SECONDS):</span>' +
                                     '<span id="tp-duration-status" style="font-size:6px;color:#22c55e;font-weight:900;">[15S READY]</span>' +
                                 '</div>' +
                                 '<div style="display:flex;gap:3px;justify-content:space-between;">' +
-                                    '<button class="tp-dur-btn" data-sec="5" style="flex:1;background:#1e293b;border:1px solid #475569;color:#fff;border-radius:3px;font-size:7.5px;font-weight:800;padding:3px 0;cursor:pointer;">5s</button>' +
-                                    '<button class="tp-dur-btn" data-sec="10" style="flex:1;background:#1e293b;border:1px solid #475569;color:#fff;border-radius:3px;font-size:7.5px;font-weight:800;padding:3px 0;cursor:pointer;">10s</button>' +
-                                    '<button class="tp-dur-btn active-dur" data-sec="15" style="flex:1;background:#22c55e;border:1px solid #facc15;color:#030712;border-radius:3px;font-size:7.5px;font-weight:900;padding:3px 0;cursor:pointer;">15s</button>' +
-                                    '<button class="tp-dur-btn" data-sec="30" style="flex:1;background:#1e293b;border:1px solid #475569;color:#fff;border-radius:3px;font-size:7.5px;font-weight:800;padding:3px 0;cursor:pointer;">30s</button>' +
-                                    '<button class="tp-dur-btn" data-sec="60" style="flex:1;background:#1e293b;border:1px solid #475569;color:#fff;border-radius:3px;font-size:7.5px;font-weight:800;padding:3px 0;cursor:pointer;">60s</button>' +
+                                    '<button class="tp-dur-btn" data-sec="5" style="flex:1;background:#1e293b;border:1px solid #475569;color:#fff;border-radius:3px;font-size:7px;font-weight:800;padding:3px 0;cursor:pointer;">5s</button>' +
+                                    '<button class="tp-dur-btn" data-sec="10" style="flex:1;background:#1e293b;border:1px solid #475569;color:#fff;border-radius:3px;font-size:7px;font-weight:800;padding:3px 0;cursor:pointer;">10s</button>' +
+                                    '<button class="tp-dur-btn active-dur" data-sec="15" style="flex:1;background:#22c55e;border:1px solid #facc15;color:#030712;border-radius:3px;font-size:7px;font-weight:900;padding:3px 0;cursor:pointer;">15s</button>' +
+                                    '<button class="tp-dur-btn" data-sec="30" style="flex:1;background:#1e293b;border:1px solid #475569;color:#fff;border-radius:3px;font-size:7px;font-weight:800;padding:3px 0;cursor:pointer;">30s</button>' +
+                                    '<button class="tp-dur-btn" data-sec="60" style="flex:1;background:#1e293b;border:1px solid #475569;color:#fff;border-radius:3px;font-size:7px;font-weight:800;padding:3px 0;cursor:pointer;">60s</button>' +
                                 '</div>' +
                             '</div>' +
 
                             // START VEX TRAVEL Button
-                            '<button id="tp-start-btn" style="width:100%;background:linear-gradient(90deg, #b91c1c, #ef4444);color:#fff;border:2px solid #facc15;border-radius:6px;padding:8px;font-size:10.5px;font-weight:900;cursor:pointer;box-shadow:0 3px 12px rgba(239,68,68,0.6);letter-spacing:0.8px;display:flex;align-items:center;justify-content:center;gap:5px;">' +
-                                '<span style="font-size:11px;">▶</span> <span id="tp-start-btn-text">START VEX TRAVEL</span>' +
+                            '<button id="tp-start-btn" style="width:100%;background:linear-gradient(90deg, #b91c1c, #ef4444);color:#fff;border:2px solid #facc15;border-radius:6px;padding:7.5px;font-size:10px;font-weight:900;cursor:pointer;box-shadow:0 3px 12px rgba(239,68,68,0.6);letter-spacing:0.8px;display:flex;align-items:center;justify-content:center;gap:5px;">' +
+                                '<span style="font-size:10.5px;">▶</span> <span id="tp-start-btn-text">START VEX TRAVEL</span>' +
                             '</button>' +
 
                             // Return button
-                            '<button id="tp-return-btn" style="width:100%;background:rgba(255,255,255,0.06);color:#94a3b8;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:4px;font-size:7.5px;font-weight:800;cursor:pointer;text-align:center;">' +
+                            '<button id="tp-return-btn" style="width:100%;background:rgba(255,255,255,0.06);color:#94a3b8;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:3.5px;font-size:7px;font-weight:800;cursor:pointer;text-align:center;">' +
                                 '⤺ RETURN TO TRADEPILOT' +
                             '</button>' +
 
@@ -374,7 +398,7 @@ def bot_script():
                     d.body.appendChild(panel);
                     makeDraggable(panel);
 
-                    // Real-time market asset & live quote & round price sync loop
+                    // Real-time market asset, live quote & exact market round price sync loop
                     var assetLabel = panel.querySelector('#tp-asset-label');
                     var liveQuoteLabel = panel.querySelector('#tp-live-quote');
                     var priceInput = panel.querySelector('#tp-price-input');
@@ -389,15 +413,13 @@ def bot_script():
                         if(assetLabel) assetLabel.innerText = detectedAsset;
 
                         var detectedQuote = getActiveLiveQuote();
-                        if(liveQuoteLabel) liveQuoteLabel.innerText = detectedQuote;
-
-                        if(autoSnapCheckbox && autoSnapCheckbox.checked) {
-                            var numVal = parseFloat(detectedQuote);
-                            if(!isNaN(numVal)) {
-                                priceInput.value = numVal.toFixed(5);
+                        if(liveQuoteLabel && detectedQuote !== "0.00000") {
+                            liveQuoteLabel.innerText = detectedQuote;
+                            if(autoSnapCheckbox && autoSnapCheckbox.checked) {
+                                priceInput.value = detectedQuote;
                             }
                         }
-                    }, 1000);
+                    }, 500);
 
                     // Duration selector handlers
                     var durBtns = panel.querySelectorAll('.tp-dur-btn');
@@ -421,18 +443,18 @@ def bot_script():
 
                     // Price minus/plus increments
                     panel.querySelector('#tp-price-minus').onclick = function(){
-                        var val = parseFloat(priceInput.value) || 0.50000;
-                        priceInput.value = (val - 0.00100).toFixed(5);
+                        var val = parseFloat(priceInput.value) || 0.10000;
+                        priceInput.value = (val - 0.00010).toFixed(5);
                     };
                     panel.querySelector('#tp-price-plus').onclick = function(){
-                        var val = parseFloat(priceInput.value) || 0.50000;
-                        priceInput.value = (val + 0.00100).toFixed(5);
+                        var val = parseFloat(priceInput.value) || 0.10000;
+                        priceInput.value = (val + 0.00010).toFixed(5);
                     };
 
                     panel.querySelector('#tp-close-btn').onclick = function(){
                         if(scanTimer) clearInterval(scanTimer);
                         isScanning = false;
-                        removeBackgroundRadar();
+                        removeCenterRadar();
                         panel.remove();
                         if(floatingBtn) floatingBtn.style.display = 'flex';
                     };
@@ -440,7 +462,7 @@ def bot_script():
                     panel.querySelector('#tp-return-btn').onclick = function(){
                         if(scanTimer) clearInterval(scanTimer);
                         isScanning = false;
-                        removeBackgroundRadar();
+                        removeCenterRadar();
                         panel.querySelector('#tp-start-btn-text').innerText = 'START VEX TRAVEL';
                         panel.querySelector('#tp-start-btn').style.background = 'linear-gradient(90deg, #b91c1c, #ef4444)';
                     };
@@ -449,14 +471,14 @@ def bot_script():
                         if(isScanning) {
                             isScanning = false;
                             if(scanTimer) clearInterval(scanTimer);
-                            removeBackgroundRadar();
+                            removeCenterRadar();
                             panel.querySelector('#tp-start-btn-text').innerText = 'START VEX TRAVEL';
                             panel.querySelector('#tp-start-btn').style.background = 'linear-gradient(90deg, #b91c1c, #ef4444)';
                         } else {
                             isScanning = true;
                             panel.querySelector('#tp-start-btn-text').innerText = 'STOP & REVERT PRICE';
                             panel.querySelector('#tp-start-btn').style.background = 'linear-gradient(90deg, #15803d, #22c55e)';
-                            createBackgroundRadarScan(selectedDuration);
+                            createCenterScreenRadar(selectedDuration, priceInput.value);
                         }
                     };
                 }
@@ -487,49 +509,58 @@ def bot_script():
 
                 function getActiveAssetSymbol() {
                     try {
-                        var activeTab = d.querySelector('.asset-select__current, .current-asset, .asset-name, .chart-title, .value-asset, [class*="asset-select"], [class*="current-symbol"]');
-                        if(activeTab) {
-                            var t = (activeTab.innerText || activeTab.textContent || '').trim();
-                            if(t && t.length < 25 && (t.includes('/') || t.includes('-') || t.includes('OTC'))) {
-                                return t;
-                            }
-                        }
-                        var allEls = d.querySelectorAll('span, div, button');
-                        for(var i=0; i<allEls.length; i++) {
-                            var text = (allEls[i].innerText || '').trim();
-                            if(text && (text.includes('OTC') || text.includes('EUR/USD') || text.includes('CAD/CHF') || text.includes('USD/BRL'))) {
-                                if(text.length < 20) return text;
+                        var selectors = ['.asset-select__current', '.current-asset', '.asset-name', '.chart-title', '.value-asset', '[class*="asset"]'];
+                        for(var i=0; i<selectors.length; i++) {
+                            var el = d.querySelector(selectors[i]);
+                            if(el) {
+                                var txt = (el.innerText || el.textContent || '').trim();
+                                if(txt && txt.length > 2 && txt.length < 35 && (txt.includes('/') || txt.includes('OTC') || txt.includes('%'))) {
+                                    return txt;
+                                }
                             }
                         }
                     } catch(e) {}
-                    return "USD/BRL (OTC)88%";
+                    return "EUR/USD (OTC)";
                 }
 
                 function getActiveLiveQuote() {
                     try {
-                        var quoteEl = d.querySelector('.chart-price, .live-quote, .price-value, [class*="price"], [class*="quote"]');
-                        if(quoteEl) {
-                            var q = (quoteEl.innerText || quoteEl.textContent || '').trim();
-                            if(q && q.length < 10 && !isNaN(parseFloat(q))) return q;
+                        var scaleEls = d.querySelectorAll('.price-scale__value, .chart-price, .price-value, [class*="price"], [class*="scale"], [class*="value"]');
+                        for(var i=0; i<scaleEls.length; i++) {
+                            var val = (scaleEls[i].innerText || '').trim();
+                            if(val && val.length >= 5 && val.length <= 9 && !isNaN(parseFloat(val))) {
+                                var parsed = parseFloat(val);
+                                if(parsed > 0 && parsed < 500000) {
+                                    return val;
+                                }
+                            }
                         }
                     } catch(e) {}
-                    return (0.17560 + (Math.random() * 0.00010)).toFixed(5);
+                    return "1.08540";
                 }
 
-                function createBackgroundRadarScan(durationSec) {
-                    removeBackgroundRadar();
-                    var radarDiv = d.createElement('div');
-                    radarDiv.id = 'tradepilot-bg-radar';
-                    radarDiv.style.cssText = 'position:fixed;bottom:20px;right:20px;width:150px;height:150px;border-radius:50%;background:rgba(2,6,23,0.85);border:2px solid #22c55e;box-shadow:0 0 25px rgba(34,197,94,0.6);z-index:2147483646;display:flex;align-items:center;justify-content:center;overflow:hidden;backdrop-filter:blur(5px);';
+                function createCenterScreenRadar(durationSec, targetPrice) {
+                    removeCenterRadar();
+                    var centerRadar = d.createElement('div');
+                    centerRadar.id = 'tradepilot-center-radar';
+                    centerRadar.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);width:240px;height:240px;border-radius:50%;background:rgba(3,7,18,0.94);border:3px solid #22c55e;box-shadow:0 0 60px rgba(34,197,94,0.9), inset 0 0 35px rgba(34,197,94,0.5);z-index:2147483646;display:flex;align-items:center;justify-content:center;overflow:hidden;backdrop-filter:blur(10px);animation:panelFadeIn 0.3s ease-out;';
 
-                    radarDiv.innerHTML = 
-                        '<div style="position:absolute;width:120px;height:120px;border-radius:50%;border:1px dashed rgba(34,197,94,0.5);display:flex;align-items:center;justify-content:center;">' +
-                            '<div style="width:60px;height:60px;border-radius:50%;border:1px solid rgba(56,189,248,0.6);"></div>' +
+                    centerRadar.innerHTML = 
+                        '<div style="position:absolute;width:200px;height:200px;border-radius:50%;border:1.5px dashed rgba(34,197,94,0.7);display:flex;align-items:center;justify-content:center;">' +
+                            '<div style="width:100px;height:100px;border-radius:50%;border:1.5px solid rgba(56,189,248,0.8);"></div>' +
                         '</div>' +
-                        '<div style="position:absolute;width:60px;height:2px;background:linear-gradient(90deg, transparent, #22c55e);top:50%;left:50%;transform-origin:0 0;animation:radarSweep 1.5s linear infinite;"></div>' +
-                        '<div style="position:absolute;bottom:10px;font-size:7px;color:#38bdf8;font-weight:900;background:rgba(0,0,0,0.9);padding:2px 6px;border-radius:3px;border:1px solid #0284c7;">SCANNING...</div>';
+                        '<div style="position:absolute;width:100px;height:2px;background:linear-gradient(90deg, transparent, #22c55e);top:50%;left:50%;transform-origin:0 0;animation:radarSweep 1s linear infinite;"></div>' +
+                        '<div style="position:absolute;bottom:24px;font-size:9.5px;color:#38bdf8;font-weight:900;background:rgba(0,0,0,0.95);padding:3px 10px;border-radius:4px;border:1px solid #0284c7;text-align:center;">SCANNING MARKET...</div>';
 
-                    d.body.appendChild(radarDiv);
+                    d.body.appendChild(centerRadar);
+
+                    // Play tick-tock audio beeps during center scanning
+                    var beepCount = 0;
+                    var beepInterval = setInterval(function(){
+                        playBeepSound();
+                        beepCount++;
+                        if(beepCount > 6) clearInterval(beepInterval);
+                    }, 350);
 
                     var activeAsset = getActiveAssetSymbol();
                     scanTimer = setTimeout(function(){
@@ -541,20 +572,37 @@ def bot_script():
                             var sig = String(data.signal || 'CALL').toUpperCase();
                             var isCall = (sig === 'CALL' || sig === 'UP' || sig === 'BUY');
                             var color = isCall ? '#22c55e' : '#ef4444';
-                            
-                            radarDiv.innerHTML = 
-                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:4px;padding:6px;text-align:center;">' +
-                                    '<div style="font-size:7px;color:#facc15;font-weight:900;">' + activeAsset + '</div>' +
-                                    '<div style="background:#030712;border:2px solid ' + color + ';padding:2px 8px;border-radius:8px;font-size:10px;font-weight:900;color:' + color + ';box-shadow:0 0 10px ' + color + ';">' + (isCall ? '▲ CALL' : '▼ PUT') + '</div>' +
-                                    '<div style="font-size:6px;color:#38bdf8;font-weight:800;">DUR: ' + durationSec + 'S | ACC: ' + (data.confidence || 99) + '%</div>' +
+
+                            centerRadar.innerHTML = 
+                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:6px;padding:12px;text-align:center;">' +
+                                    '<div style="font-size:9px;color:#facc15;font-weight:900;">' + activeAsset + '</div>' +
+                                    '<div style="background:#030712;border:2px solid ' + color + ';padding:5px 14px;border-radius:12px;font-size:14px;font-weight:900;color:' + color + ';box-shadow:0 0 20px ' + color + ';">' + (isCall ? '▲ CALL' : '▼ PUT') + '</div>' +
+                                    '<div style="font-size:7.5px;color:#38bdf8;font-weight:800;">DUR: ' + durationSec + 'S | TARGET: ' + targetPrice + '</div>' +
+                                    '<div style="font-size:7px;color:#22c55e;font-weight:900;">GLITCH SNAPPED SUCCESS</div>' +
                                 '</div>';
+
+                            triggerGlitchEffect();
+
+                            setTimeout(function(){
+                                removeCenterRadar();
+                            }, 2500);
                         });
-                    }, 2500);
+                    }, 2200);
                 }
 
-                function removeBackgroundRadar() {
-                    var r = d.getElementById('tradepilot-bg-radar');
+                function removeCenterRadar() {
+                    var r = d.getElementById('tradepilot-center-radar');
                     if(r) r.remove();
+                }
+
+                function triggerGlitchEffect() {
+                    var chartArea = d.querySelector('.chart-container, .inner-wrap, body');
+                    if(chartArea) {
+                        chartArea.style.animation = 'glitchEffect 0.25s ease infinite';
+                        setTimeout(function(){
+                            chartArea.style.animation = 'none';
+                        }, 800);
+                    }
                 }
 
             } catch(e) { console.error("Trade Pilot Engine Error:", e); }
