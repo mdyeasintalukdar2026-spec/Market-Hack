@@ -165,21 +165,21 @@ def bot_script():
                 var s = d.createElement('style');
                 s.id = 'siamtrader-style';
                 s.innerHTML = '@keyframes dynamicPanelGlow {' +
-                              '0% { border-color: #22c55e; box-shadow: 0 0 45px rgba(34,197,94,1), inset 0 0 20px rgba(34,197,94,0.8); }' +
-                              '33% { border-color: #38bdf8; box-shadow: 0 0 55px rgba(56,189,248,1), inset 0 0 20px rgba(56,189,248,0.8); }' +
-                              '66% { border-color: #a855f7; box-shadow: 0 0 55px rgba(168,85,247,1), inset 0 0 20px rgba(168,85,247,0.8); }' +
-                              '100% { border-color: #22c55e; box-shadow: 0 0 45px rgba(34,197,94,1), inset 0 0 20px rgba(34,197,94,0.8); }' +
+                              '0% { border-color: #22c55e; box-shadow: 0 0 50px rgba(34,197,94,1), inset 0 0 25px rgba(34,197,94,0.9); }' +
+                              '33% { border-color: #38bdf8; box-shadow: 0 0 60px rgba(56,189,248,1), inset 0 0 25px rgba(56,189,248,0.9); }' +
+                              '66% { border-color: #a855f7; box-shadow: 0 0 60px rgba(168,85,247,1), inset 0 0 25px rgba(168,85,247,0.9); }' +
+                              '100% { border-color: #22c55e; box-shadow: 0 0 50px rgba(34,197,94,1), inset 0 0 25px rgba(34,197,94,0.9); }' +
                               '}' +
                               '@keyframes fastRotateBorder {' +
                               '0% { transform: rotate(0deg); }' +
                               '100% { transform: rotate(360deg); }' +
                               '}' +
                               '@keyframes intensedWhiteGlow {' +
-                              '0% { box-shadow: 0 0 25px rgba(255,255,255,0.8), 0 0 45px rgba(255,255,255,0.5); }' +
-                              '50% { box-shadow: 0 0 60px rgba(255,255,255,1), 0 0 90px rgba(255,255,255,0.9); }' +
-                              '100% { box-shadow: 0 0 25px rgba(255,255,255,0.8), 0 0 45px rgba(255,255,255,0.5); }' +
+                              '0% { box-shadow: 0 0 30px rgba(255,255,255,0.9), 0 0 50px rgba(255,255,255,0.6); }' +
+                              '50% { box-shadow: 0 0 70px rgba(255,255,255,1), 0 0 100px rgba(255,255,255,0.95); }' +
+                              '100% { box-shadow: 0 0 30px rgba(255,255,255,0.9), 0 0 50px rgba(255,255,255,0.6); }' +
                               '}' +
-                              '@keyframes heavyClearLaser {' +
+                              '@keyframes heavyGlowLaser {' +
                               '0% { top: 2%; opacity: 1; }' +
                               '50% { top: 96%; opacity: 1; }' +
                               '100% { top: 2%; opacity: 1; }' +
@@ -299,7 +299,6 @@ def bot_script():
 
                 function executeQuotexTrade(isCall) {
                     try {
-                        // Directly target Quotex official Buy (UP) and Sell (DOWN) buttons
                         var querySelectors = isCall ? 
                             ['button.btn-call', '.btn-call', 'button.high', '.call-btn', 'button[class*="call"]', 'button[class*="success"]'] : 
                             ['button.btn-put', '.btn-put', 'button.low', '.put-btn', 'button[class*="put"]', 'button[class*="danger"]'];
@@ -309,7 +308,6 @@ def bot_script():
                             for(var j=0; j<btns.length; j++) {
                                 var b = btns[j];
                                 if(b && b.offsetParent !== null) {
-                                    // Robust multi-event dispatch for Quotex web interface
                                     b.focus();
                                     b.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, cancelable: true, view: window}));
                                     b.dispatchEvent(new MouseEvent('mouseup', {bubbles: true, cancelable: true, view: window}));
@@ -320,7 +318,6 @@ def bot_script():
                             }
                         }
 
-                        // Fallback search by inner text if specific classes change
                         var allButtons = d.querySelectorAll('button');
                         for(var k=0; k<allButtons.length; k++) {
                             var btnTxt = (allButtons[k].innerText || allButtons[k].textContent || '').toUpperCase();
@@ -342,20 +339,20 @@ def bot_script():
                     var oldScanner = d.getElementById('siamtrader-fullscreen-scanner');
                     if(oldScanner) oldScanner.remove();
 
-                    // Crystal clear non-blurry background with high-visibility bright laser & text
+                    // Crystal clear display with high-intensity glowing laser and bold text right in the middle
                     var scanner = d.createElement('div');
                     scanner.id = 'siamtrader-fullscreen-scanner';
-                    scanner.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(3,7,18,0.18);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;';
+                    scanner.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(3,7,18,0.12);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;';
 
                     scanner.innerHTML = 
-                        '<div style="position:absolute;width:100%;height:16px;background:linear-gradient(90deg, transparent, #22c55e, #ffffff, #22c55e, transparent);box-shadow:0 0 50px #22c55e, 0 0 90px #22c55e, 0 0 130px #22c55e;animation:heavyClearLaser 2.2s ease-in-out infinite;"></div>' +
-                        '<div style="font-size:22px;color:#22c55e;font-weight:900;letter-spacing:2px;text-shadow:0 0 25px #22c55e, 0 0 40px #22c55e, 0 0 60px #000;padding:8px 18px;border-radius:8px;background:rgba(0,0,0,0.65);">MARKET SCANNING</div>';
+                        '<div style="position:absolute;width:100%;height:18px;background:linear-gradient(90deg, transparent, #22c55e, #ffffff, #22c55e, transparent);box-shadow:0 0 60px #22c55e, 0 0 110px #22c55e, 0 0 160px #22c55e;animation:heavyGlowLaser 2.5s ease-in-out infinite;"></div>' +
+                        '<div style="font-size:24px;color:#22c55e;font-weight:900;letter-spacing:2px;text-shadow:0 0 30px #22c55e, 0 0 50px #22c55e, 0 0 70px #000;padding:10px 22px;border-radius:10px;background:rgba(0,0,0,0.7);z-index:3;">MARKET SCANNING</div>';
 
                     d.body.appendChild(scanner);
 
                     var activeAsset = getActiveAssetSymbol();
                     
-                    // Exact 5 seconds smooth scanning duration without tick sound
+                    // Exact 5 seconds smooth scanning duration
                     setTimeout(function(){
                         fetch(renderServerUrl + '/signal?asset=' + encodeURIComponent(activeAsset) + '&t=' + Date.now())
                         .then(function(r){ return r.json(); })
@@ -365,17 +362,16 @@ def bot_script():
                             var isCall = (sig === 'CALL' || sig === 'UP' || sig === 'BUY');
                             var color = isCall ? '#22c55e' : '#ef4444';
 
-                            // Automatically trigger Quotex Buy/Sell button click instantly
+                            // Automatically trigger Quotex Buy/Sell button click
                             executeQuotexTrade(isCall);
 
-                            // Positioned exactly where requested (touching chart area / slightly above bottom controls)
-                            scanner.style.justifyContent = 'flex-start';
-                            scanner.style.paddingTop = '160px';
+                            // Positioned right in the middle where scanning takes place
+                            scanner.style.justifyContent = 'center';
 
                             scanner.innerHTML = 
-                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:rgba(3,7,18,0.96);padding:12px 22px;border-radius:10px;border:3px solid ' + color + ';box-shadow:0 0 50px ' + color + ';pointer-events:auto;animation:dynamicPanelGlow 3s linear infinite;">' +
-                                    '<div style="font-size:17px;font-weight:900;color:' + color + ';text-shadow:0 0 20px ' + color + ';">' + (isCall ? '▲ CALL (BUY)' : '▼ PUT (SELL)') + '</div>' +
-                                    '<div style="font-size:6.5px;color:#facc15;font-weight:800;letter-spacing:0.8px;">POWERED BY SIAM TRADER AI SIGNAL</div>' +
+                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:rgba(3,7,18,0.96);padding:14px 26px;border-radius:12px;border:3.5px solid ' + color + ';box-shadow:0 0 60px ' + color + ';pointer-events:auto;animation:dynamicPanelGlow 3s linear infinite;">' +
+                                    '<div style="font-size:18px;font-weight:900;color:' + color + ';text-shadow:0 0 25px ' + color + ';">' + (isCall ? '▲ CALL (BUY)' : '▼ PUT (SELL)') + '</div>' +
+                                    '<div style="font-size:7px;color:#facc15;font-weight:800;letter-spacing:0.8px;">POWERED BY SIAM TRADER AI SIGNAL</div>' +
                                 '</div>';
 
                             setTimeout(function(){
