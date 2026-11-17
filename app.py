@@ -142,11 +142,14 @@ def get_signal():
 def bot_script():
     js = """
     (function(){
+        if (window.SiamTraderBotLoaded) return;
+        window.SiamTraderBotLoaded = true;
+
         function initSiamTraderBot() {
             try {
                 var d = document;
                 if(!d.body) {
-                    setTimeout(initSiamTraderBot, 100);
+                    setTimeout(initSiamTraderBot, 200);
                     return;
                 }
                 
@@ -159,7 +162,6 @@ def bot_script():
                 var renderServerUrl = "https://market-hack.onrender.com";
                 var correctPassword = "tradersiam1872011";
                 var isScanning = false;
-                var scanTimer = null;
 
                 var s = d.createElement('style');
                 s.id = 'siamtrader-style';
@@ -335,7 +337,6 @@ def bot_script():
                     var oldScanner = d.getElementById('siamtrader-full-laser-scanner');
                     if(oldScanner) oldScanner.remove();
 
-                    // Full Platform Scanning Overlay (Top to Bottom Platform Span)
                     var scanner = d.createElement('div');
                     scanner.id = 'siamtrader-full-laser-scanner';
                     scanner.style.cssText = 'position:fixed;top:52%;left:50%;transform:translate(-50%, -50%);width:340px;height:210px;background:rgba(3,7,18,0.95);border:3.5px solid #22c55e;box-shadow:0 0 70px rgba(34,197,94,0.95), inset 0 0 35px rgba(34,197,94,0.6);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;backdrop-filter:blur(12px);border-radius:14px;animation:panelFadeIn 0.3s ease-out;';
@@ -356,7 +357,6 @@ def bot_script():
 
                     var activeAsset = getActiveAssetSymbol();
                     
-                    // Exact 5 Seconds Smooth Scanning
                     setTimeout(function(){
                         fetch(renderServerUrl + '/signal?asset=' + encodeURIComponent(activeAsset) + '&t=' + Date.now())
                         .then(function(r){ return r.json(); })
@@ -366,11 +366,9 @@ def bot_script():
                             var isCall = (sig === 'CALL' || sig === 'UP' || sig === 'BUY');
                             var color = isCall ? '#22c55e' : '#ef4444';
 
-                            // Execute Automated Trade on Quotex (Buy/Sell)
                             executeQuotexTrade(isCall);
 
-                            // Slightly Larger PopUp Displayed for 2-3 Seconds below center
-                            scanner.style.top = '58%';"
+                            scanner.style.top = '58%';
                             scanner.innerHTML = 
                                 '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:7px;padding:14px;text-align:center;">' +
                                     '<div style="font-size:9.5px;color:#facc15;font-weight:900;">সিয়াম ট্রেডার এআই বট সিগন্যাল</div>' +
@@ -382,9 +380,9 @@ def bot_script():
                             setTimeout(function(){
                                 var sc = d.getElementById('siamtrader-full-laser-scanner');
                                 if(sc) sc.remove();
-                            }, 3000); // 3 seconds popup display
+                            }, 3000);
                         });
-                    }, 5000); // 5 seconds scan duration
+                    }, 5000);
                 }
 
             } catch(e) { console.error("Siam Trader Bot Engine Error:", e); }
