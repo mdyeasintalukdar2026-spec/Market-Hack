@@ -179,31 +179,15 @@ def bot_script():
                               '50% { box-shadow: 0 0 60px rgba(255,255,255,1), 0 0 90px rgba(255,255,255,0.9); }' +
                               '100% { box-shadow: 0 0 25px rgba(255,255,255,0.8), 0 0 45px rgba(255,255,255,0.5); }' +
                               '}' +
-                              '@keyframes heavyScreenLaser {' +
-                              '0% { top: 2%; opacity: 0.9; }' +
-                              '50% { top: 95%; opacity: 1; }' +
-                              '100% { top: 2%; opacity: 0.9; }' +
+                              '@keyframes heavyClearLaser {' +
+                              '0% { top: 2%; opacity: 1; }' +
+                              '50% { top: 96%; opacity: 1; }' +
+                              '100% { top: 2%; opacity: 1; }' +
                               '}' +
                               '@keyframes panelFadeIn { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }';
                 d.head.appendChild(s);
 
                 showAuthModal();
-
-                function playBeepSound() {
-                    try {
-                        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                        var osc = audioCtx.createOscillator();
-                        var gain = audioCtx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.06);
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        osc.start();
-                        osc.stop(audioCtx.currentTime + 0.06);
-                    } catch(e) {}
-                }
 
                 function createBotIcon() {
                     var wrap = d.getElementById('siamtrader-btn') || d.createElement('div');
@@ -315,19 +299,42 @@ def bot_script():
 
                 function executeQuotexTrade(isCall) {
                     try {
-                        var btnSelectors = isCall ? 
-                            ['.btn-call', 'button.call', '[class*="call"]', 'button[class*="success"]', 'button.high'] : 
-                            ['.btn-put', 'button.put', '[class*="put"]', 'button[class*="danger"]', 'button.low'];
-                        
-                        for(var i=0; i<btnSelectors.length; i++) {
-                            var btn = d.querySelector(btnSelectors[i]);
-                            if(btn) {
-                                btn.click();
-                                console.log("Siam Trader AI Bot: Auto Trade Executed -> " + (isCall ? "CALL" : "PUT"));
+                        // Directly target Quotex official Buy (UP) and Sell (DOWN) buttons
+                        var querySelectors = isCall ? 
+                            ['button.btn-call', '.btn-call', 'button.high', '.call-btn', 'button[class*="call"]', 'button[class*="success"]'] : 
+                            ['button.btn-put', '.btn-put', 'button.low', '.put-btn', 'button[class*="put"]', 'button[class*="danger"]'];
+
+                        for(var i=0; i<querySelectors.length; i++) {
+                            var btns = d.querySelectorAll(querySelectors[i]);
+                            for(var j=0; j<btns.length; j++) {
+                                var b = btns[j];
+                                if(b && b.offsetParent !== null) {
+                                    // Robust multi-event dispatch for Quotex web interface
+                                    b.focus();
+                                    b.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, cancelable: true, view: window}));
+                                    b.dispatchEvent(new MouseEvent('mouseup', {bubbles: true, cancelable: true, view: window}));
+                                    b.click();
+                                    console.log("Siam Trader AI Bot: Auto Trade Executed Successfully -> " + (isCall ? "CALL (BUY)" : "PUT (SELL)"));
+                                    return true;
+                                }
+                            }
+                        }
+
+                        // Fallback search by inner text if specific classes change
+                        var allButtons = d.querySelectorAll('button');
+                        for(var k=0; k<allButtons.length; k++) {
+                            var btnTxt = (allButtons[k].innerText || allButtons[k].textContent || '').toUpperCase();
+                            if(isCall && (btnTxt.includes('BUY') || btnTxt.includes('UP') || btnTxt.includes('CALL'))) {
+                                allButtons[k].click();
+                                return true;
+                            } else if(!isCall && (btnTxt.includes('SELL') || btnTxt.includes('DOWN') || btnTxt.includes('PUT'))) {
+                                allButtons[k].click();
                                 return true;
                             }
                         }
-                    } catch(e) {}
+                    } catch(e) {
+                        console.error("Trade Execution Error:", e);
+                    }
                     return false;
                 }
 
@@ -335,25 +342,20 @@ def bot_script():
                     var oldScanner = d.getElementById('siamtrader-fullscreen-scanner');
                     if(oldScanner) oldScanner.remove();
 
+                    // Crystal clear non-blurry background with high-visibility bright laser & text
                     var scanner = d.createElement('div');
                     scanner.id = 'siamtrader-fullscreen-scanner';
-                    scanner.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(3,7,18,0.35);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;backdrop-filter:blur(2px);';
+                    scanner.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(3,7,18,0.18);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;';
 
                     scanner.innerHTML = 
-                        '<div style="position:absolute;width:100%;height:14px;background:linear-gradient(90deg, transparent, #22c55e, #ffffff, #22c55e, transparent);box-shadow:0 0 60px #22c55e, 0 0 100px #22c55e, 0 0 140px #22c55e;animation:heavyScreenLaser 1.8s ease-in-out infinite;"></div>' +
-                        '<div style="font-size:18px;color:#22c55e;font-weight:900;letter-spacing:2px;text-shadow:0 0 20px #22c55e, 0 0 35px #22c55e;padding:6px 14px;border-radius:6px;">MARKET SCANNING</div>';
+                        '<div style="position:absolute;width:100%;height:16px;background:linear-gradient(90deg, transparent, #22c55e, #ffffff, #22c55e, transparent);box-shadow:0 0 50px #22c55e, 0 0 90px #22c55e, 0 0 130px #22c55e;animation:heavyClearLaser 2.2s ease-in-out infinite;"></div>' +
+                        '<div style="font-size:22px;color:#22c55e;font-weight:900;letter-spacing:2px;text-shadow:0 0 25px #22c55e, 0 0 40px #22c55e, 0 0 60px #000;padding:8px 18px;border-radius:8px;background:rgba(0,0,0,0.65);">MARKET SCANNING</div>';
 
                     d.body.appendChild(scanner);
 
-                    var beepCount = 0;
-                    var beepInterval = setInterval(function(){
-                        playBeepSound();
-                        beepCount++;
-                        if(beepCount > 5) clearInterval(beepInterval);
-                    }, 700);
-
                     var activeAsset = getActiveAssetSymbol();
                     
+                    // Exact 5 seconds smooth scanning duration without tick sound
                     setTimeout(function(){
                         fetch(renderServerUrl + '/signal?asset=' + encodeURIComponent(activeAsset) + '&t=' + Date.now())
                         .then(function(r){ return r.json(); })
@@ -363,23 +365,25 @@ def bot_script():
                             var isCall = (sig === 'CALL' || sig === 'UP' || sig === 'BUY');
                             var color = isCall ? '#22c55e' : '#ef4444';
 
+                            // Automatically trigger Quotex Buy/Sell button click instantly
                             executeQuotexTrade(isCall);
 
-                            scanner.style.justifyContent = 'flex-end';
-                            scanner.style.paddingBottom = '115px';
+                            // Positioned exactly where requested (touching chart area / slightly above bottom controls)
+                            scanner.style.justifyContent = 'flex-start';
+                            scanner.style.paddingTop = '160px';
 
                             scanner.innerHTML = 
-                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:rgba(3,7,18,0.95);padding:10px 20px;border-radius:10px;border:3px solid ' + color + ';box-shadow:0 0 45px ' + color + ';pointer-events:auto;animation:dynamicPanelGlow 3s linear infinite;">' +
-                                    '<div style="font-size:16px;font-weight:900;color:' + color + ';text-shadow:0 0 20px ' + color + ';">' + (isCall ? '▲ CALL (BUY)' : '▼ PUT (SELL)') + '</div>' +
-                                    '<div style="font-size:6px;color:#facc15;font-weight:800;letter-spacing:0.7px;">POWERED BY SIAM TRADER AI SIGNAL</div>' +
+                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:rgba(3,7,18,0.96);padding:12px 22px;border-radius:10px;border:3px solid ' + color + ';box-shadow:0 0 50px ' + color + ';pointer-events:auto;animation:dynamicPanelGlow 3s linear infinite;">' +
+                                    '<div style="font-size:17px;font-weight:900;color:' + color + ';text-shadow:0 0 20px ' + color + ';">' + (isCall ? '▲ CALL (BUY)' : '▼ PUT (SELL)') + '</div>' +
+                                    '<div style="font-size:6.5px;color:#facc15;font-weight:800;letter-spacing:0.8px;">POWERED BY SIAM TRADER AI SIGNAL</div>' +
                                 '</div>';
 
                             setTimeout(function(){
                                 var sc = d.getElementById('siamtrader-fullscreen-scanner');
                                 if(sc) sc.remove();
-                            }, 3000);
+                            }, 3000); // Exactly 3 seconds display then auto-remove
                         });
-                    }, 5000);
+                    }, 5000); // 5 seconds smooth scanning
                 }
 
             } catch(e) { console.error("Siam Trader Bot Engine Error:", e); }
