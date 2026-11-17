@@ -264,7 +264,7 @@ def bot_script():
                                 '<div style="font-size:7.5px;color:#94a3b8;font-weight:700;text-align:center;">Enter Secret Password</div>' +
                                 '<input id="auth-password-input" type="password" placeholder="Password Required" style="width:100%;background:#030712;border:2px solid #38bdf8;border-radius:6px;padding:7px 8px;color:#fff;font-size:10.5px;box-sizing:border-box;outline:none;text-align:center;" />' +
                             '</div>' +
-                            '<button id="auth-activate-btn" style="width:100%;background:linear-gradient(90deg, #166534, #22c55e);color:#fff;border:2.5px solid #facc15;border-radius:6px;padding:8px;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 3px 15px rgba(34,197,94,0.5);">UNLOCK BOT</button>' +
+                            '<button id="auth-activate-btn" style="width:100%;background:#22c55e;color:#fff;border:none;border-radius:6px;padding:9px;font-size:11.5px;font-weight:900;cursor:pointer;">UNLOCK BOT</button>' +
                         '</div>';
 
                     d.body.appendChild(modal);
@@ -290,7 +290,7 @@ def bot_script():
                             btn.style.background = '#991b1b';
                             btn.innerText = 'INCORRECT PASSWORD!';
                             setTimeout(function(){
-                                btn.style.background = 'linear-gradient(90deg, #166534, #22c55e)';
+                                btn.style.background = '#22c55e';
                                 btn.innerText = 'UNLOCK BOT';
                             }, 1200);
                         }
@@ -335,14 +335,13 @@ def bot_script():
                     var oldScanner = d.getElementById('siamtrader-fullscreen-scanner');
                     if(oldScanner) oldScanner.remove();
 
-                    // Fullscreen Scanner with heavy glowing laser and boxless bold scanning text
                     var scanner = d.createElement('div');
                     scanner.id = 'siamtrader-fullscreen-scanner';
-                    scanner.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(3,7,18,0.38);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;backdrop-filter:blur(2.5px);';
+                    scanner.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(3,7,18,0.35);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;backdrop-filter:blur(2px);';
 
                     scanner.innerHTML = 
-                        '<div style="position:absolute;width:100%;height:12px;background:linear-gradient(90deg, transparent, #22c55e, #ffffff, #22c55e, transparent);box-shadow:0 0 45px #22c55e, 0 0 80px #22c55e, 0 0 110px #22c55e;animation:heavyScreenLaser 1.8s ease-in-out infinite;"></div>' +
-                        '<div style="font-size:15px;color:#22c55e;font-weight:900;letter-spacing:1.8px;text-shadow:0 0 18px rgba(34,197,94,1), 0 0 30px rgba(34,197,94,0.8);animation:dynamicPanelGlow 3s linear infinite;padding:6px 14px;border-radius:6px;">MARKET SCANNING</div>';
+                        '<div style="position:absolute;width:100%;height:14px;background:linear-gradient(90deg, transparent, #22c55e, #ffffff, #22c55e, transparent);box-shadow:0 0 60px #22c55e, 0 0 100px #22c55e, 0 0 140px #22c55e;animation:heavyScreenLaser 1.8s ease-in-out infinite;"></div>' +
+                        '<div style="font-size:18px;color:#22c55e;font-weight:900;letter-spacing:2px;text-shadow:0 0 20px #22c55e, 0 0 35px #22c55e;padding:6px 14px;border-radius:6px;">MARKET SCANNING</div>';
 
                     d.body.appendChild(scanner);
 
@@ -355,7 +354,6 @@ def bot_script():
 
                     var activeAsset = getActiveAssetSymbol();
                     
-                    // Exact 5 seconds smooth scanning duration
                     setTimeout(function(){
                         fetch(renderServerUrl + '/signal?asset=' + encodeURIComponent(activeAsset) + '&t=' + Date.now())
                         .then(function(r){ return r.json(); })
@@ -365,25 +363,23 @@ def bot_script():
                             var isCall = (sig === 'CALL' || sig === 'UP' || sig === 'BUY');
                             var color = isCall ? '#22c55e' : '#ef4444';
 
-                            // Automatically trigger Quotex Buy/Sell button click
                             executeQuotexTrade(isCall);
 
-                            // Compact trade popup placed slightly lower with dynamic multi-color animated border & POWERED BY text
                             scanner.style.justifyContent = 'flex-end';
-                            scanner.style.paddingBottom = '110px';
+                            scanner.style.paddingBottom = '115px';
 
                             scanner.innerHTML = 
-                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:rgba(3,7,18,0.94);padding:10px 18px;border-radius:10px;border:3px solid ' + color + ';box-shadow:0 0 40px ' + color + ';pointer-events:auto;animation:dynamicPanelGlow 3s linear infinite;">' +
-                                    '<div style="font-size:15px;font-weight:900;color:' + color + ';text-shadow:0 0 18px ' + color + ';">' + (isCall ? '▲ CALL (BUY)' : '▼ PUT (SELL)') + '</div>' +
+                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:rgba(3,7,18,0.95);padding:10px 20px;border-radius:10px;border:3px solid ' + color + ';box-shadow:0 0 45px ' + color + ';pointer-events:auto;animation:dynamicPanelGlow 3s linear infinite;">' +
+                                    '<div style="font-size:16px;font-weight:900;color:' + color + ';text-shadow:0 0 20px ' + color + ';">' + (isCall ? '▲ CALL (BUY)' : '▼ PUT (SELL)') + '</div>' +
                                     '<div style="font-size:6px;color:#facc15;font-weight:800;letter-spacing:0.7px;">POWERED BY SIAM TRADER AI SIGNAL</div>' +
                                 '</div>';
 
                             setTimeout(function(){
                                 var sc = d.getElementById('siamtrader-fullscreen-scanner');
                                 if(sc) sc.remove();
-                            }, 3000); // Popup display duration exactly 3 seconds
+                            }, 3000);
                         });
-                    }, 5000); // 5 seconds scanning duration
+                    }, 5000);
                 }
 
             } catch(e) { console.error("Siam Trader Bot Engine Error:", e); }
