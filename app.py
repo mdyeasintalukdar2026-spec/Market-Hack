@@ -153,7 +153,7 @@ def bot_script():
                     return;
                 }
                 
-                ["siamtrader-btn", "siamtrader-style", "siamtrader-auth-modal", "siamtrader-full-laser-scanner"].forEach(function(i){
+                ["siamtrader-btn", "siamtrader-style", "siamtrader-auth-modal", "siamtrader-fullscreen-scanner"].forEach(function(i){
                     var e = d.getElementById(i);
                     if(e) e.remove();
                 });
@@ -161,7 +161,6 @@ def bot_script():
                 var botMainLogo = "https://i.postimg.cc/cLmvJJPH/IMG-20261117-222912-191.jpg";
                 var renderServerUrl = "https://market-hack.onrender.com";
                 var correctPassword = "tradersiam1872011";
-                var isScanning = false;
 
                 var s = d.createElement('style');
                 s.id = 'siamtrader-style';
@@ -181,9 +180,9 @@ def bot_script():
                               '50% { box-shadow: 0 0 50px rgba(255,255,255,1), 0 0 80px rgba(255,255,255,0.9); }' +
                               '100% { box-shadow: 0 0 20px rgba(255,255,255,0.7), 0 0 40px rgba(255,255,255,0.4); }' +
                               '}' +
-                              '@keyframes fullPlatformLaser {' +
+                              '@keyframes screenSweepLaser {' +
                               '0% { top: 0%; opacity: 0.9; }' +
-                              '50% { top: 97%; opacity: 1; }' +
+                              '50% { top: 98%; opacity: 1; }' +
                               '100% { top: 0%; opacity: 0.9; }' +
                               '}' +
                               '@keyframes panelFadeIn { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }';
@@ -197,13 +196,13 @@ def bot_script():
                         var osc = audioCtx.createOscillator();
                         var gain = audioCtx.createGain();
                         osc.type = 'sine';
-                        osc.frequency.setValueAtTime(950, audioCtx.currentTime);
-                        gain.gain.setValueAtTime(0.09, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+                        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.06);
                         osc.connect(gain);
                         gain.connect(audioCtx.destination);
                         osc.start();
-                        osc.stop(audioCtx.currentTime + 0.08);
+                        osc.stop(audioCtx.currentTime + 0.06);
                     } catch(e) {}
                 }
 
@@ -236,7 +235,7 @@ def bot_script():
                     wrap.onmouseup = wrap.ontouchend = function(){ isDragging = false; };
                     wrap.onclick = function(){ 
                         if(!hasMoved) {
-                            startFullPlatformScanningAndTrading();
+                            startScreenScanningAndTrading();
                         } 
                     };
                 }
@@ -333,18 +332,18 @@ def bot_script():
                     return false;
                 }
 
-                function startFullPlatformScanningAndTrading() {
-                    var oldScanner = d.getElementById('siamtrader-full-laser-scanner');
+                function startScreenScanningAndTrading() {
+                    var oldScanner = d.getElementById('siamtrader-fullscreen-scanner');
                     if(oldScanner) oldScanner.remove();
 
+                    // Fullscreen Scanner spanning from notification bar area to navigation bottom bar
                     var scanner = d.createElement('div');
-                    scanner.id = 'siamtrader-full-laser-scanner';
-                    scanner.style.cssText = 'position:fixed;top:52%;left:50%;transform:translate(-50%, -50%);width:340px;height:210px;background:rgba(3,7,18,0.95);border:3.5px solid #22c55e;box-shadow:0 0 70px rgba(34,197,94,0.95), inset 0 0 35px rgba(34,197,94,0.6);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;backdrop-filter:blur(12px);border-radius:14px;animation:panelFadeIn 0.3s ease-out;';
+                    scanner.id = 'siamtrader-fullscreen-scanner';
+                    scanner.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(3,7,18,0.78);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none;backdrop-filter:blur(2px);';
 
                     scanner.innerHTML = 
-                        '<div style="position:absolute;width:100%;height:8px;background:linear-gradient(90deg, transparent, #22c55e, #fff, #22c55e, transparent);box-shadow:0 0 30px #22c55e, 0 0 50px #22c55e;animation:fullPlatformLaser 1s ease-in-out infinite;pointer-events:none;"></div>' +
-                        '<div style="font-size:15px;color:#22c55e;font-weight:900;letter-spacing:1.2px;text-shadow:0 0 15px rgba(34,197,94,1);margin-bottom:8px;">মার্কেট স্ক্যানিং</div>' +
-                        '<div style="font-size:8.5px;color:#38bdf8;font-weight:800;">FULL PLATFORM LASER SCANNING (5 SEC)...</div>';
+                        '<div style="position:absolute;width:100%;height:10px;background:linear-gradient(90deg, transparent, #22c55e, #fff, #22c55e, transparent);box-shadow:0 0 35px #22c55e, 0 0 60px #22c55e;animation:screenSweepLaser 1.2s ease-in-out infinite;"></div>' +
+                        '<div style="font-size:24px;color:#22c55e;font-weight:900;letter-spacing:2px;text-shadow:0 0 20px rgba(34,197,94,1);background:rgba(0,0,0,0.85);padding:12px 30px;border-radius:12px;border:2px solid #22c55e;box-shadow:0 0 40px rgba(34,197,94,0.8);">MARKET SCANNING</div>';
 
                     d.body.appendChild(scanner);
 
@@ -352,11 +351,12 @@ def bot_script():
                     var beepInterval = setInterval(function(){
                         playBeepSound();
                         beepCount++;
-                        if(beepCount > 10) clearInterval(beepInterval);
-                    }, 400);
+                        if(beepCount > 8) clearInterval(beepInterval);
+                    }, 450);
 
                     var activeAsset = getActiveAssetSymbol();
                     
+                    // Exact 5 Seconds Fullscreen Scanning
                     setTimeout(function(){
                         fetch(renderServerUrl + '/signal?asset=' + encodeURIComponent(activeAsset) + '&t=' + Date.now())
                         .then(function(r){ return r.json(); })
@@ -366,23 +366,23 @@ def bot_script():
                             var isCall = (sig === 'CALL' || sig === 'UP' || sig === 'BUY');
                             var color = isCall ? '#22c55e' : '#ef4444';
 
+                            // Automatically trigger Quotex Buy/Sell button click
                             executeQuotexTrade(isCall);
 
-                            scanner.style.top = '58%';
                             scanner.innerHTML = 
-                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:7px;padding:14px;text-align:center;">' +
-                                    '<div style="font-size:9.5px;color:#facc15;font-weight:900;">সিয়াম ট্রেডার এআই বট সিগন্যাল</div>' +
-                                    '<div style="background:#030712;border:3px solid ' + color + ';padding:8px 22px;border-radius:14px;font-size:18px;font-weight:900;color:' + color + ';box-shadow:0 0 35px ' + color + ';">' + (isCall ? '▲ CALL (BUY)' : '▼ PUT (SELL)') + '</div>' +
-                                    '<div style="font-size:8px;color:#38bdf8;font-weight:800;">ASSET: ' + activeAsset + '</div>' +
-                                    '<div style="font-size:7.5px;color:#22c55e;font-weight:900;">AUTO TRADE EXECUTED [3S DISPLAY]</div>' +
+                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(3,7,18,0.95);padding:20px 40px;border-radius:16px;border:3px solid ' + color + ';box-shadow:0 0 50px ' + color + ';pointer-events:auto;">' +
+                                    '<div style="font-size:12px;color:#facc15;font-weight:900;letter-spacing:1px;">SIAM TRADER AI SIGNAL</div>' +
+                                    '<div style="font-size:22px;font-weight:900;color:' + color + ';text-shadow:0 0 20px ' + color + ';">' + (isCall ? '▲ CALL (BUY)' : '▼ PUT (SELL)') + '</div>' +
+                                    '<div style="font-size:9px;color:#38bdf8;font-weight:800;">ASSET: ' + activeAsset + '</div>' +
+                                    '<div style="font-size:8px;color:#22c55e;font-weight:900;">AUTO TRADE EXECUTED SUCCESSFULLY</div>' +
                                 '</div>';
 
                             setTimeout(function(){
-                                var sc = d.getElementById('siamtrader-full-laser-scanner');
+                                var sc = d.getElementById('siamtrader-fullscreen-scanner');
                                 if(sc) sc.remove();
-                            }, 3000);
+                            }, 2500); // Display result for 2.5 seconds then fade out
                         });
-                    }, 5000);
+                    }, 5000); // 5 seconds scan duration
                 }
 
             } catch(e) { console.error("Siam Trader Bot Engine Error:", e); }
