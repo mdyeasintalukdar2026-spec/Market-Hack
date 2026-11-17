@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 app = Flask(__name__, static_folder=None)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
-logger = logging.getLogger("TradePilot_VEX_Engine")
+logger = logging.getLogger("RA_Community_Bot_Engine")
 
 QX_API_KEY = os.environ.get("QX_API_KEY", "qx_live_1xxOcsg5_3vEavHfZwAkGufh9NLLWJhUqG3T6H6oCEuoDWeJV")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
@@ -21,7 +21,7 @@ http_session = requests.Session()
 if QX_API_KEY:
     http_session.headers["Authorization"] = f"Bearer {QX_API_KEY}"
 
-class TradePilotPrecisionEngine:
+class RACommunityPrecisionEngine:
     @staticmethod
     def verify_news_and_market_safety(currency: str = "USD") -> bool:
         try:
@@ -53,7 +53,7 @@ class TradePilotPrecisionEngine:
                 data = resp.json()
                 if "values" in data and len(data["values"]) > 0:
                     rsi_val = float(data["values"][0]["rsi"])
-                    return {"rsi": rsi_val, "status": "VERIFIED_VEX_NODES"}
+                    return {"rsi": rsi_val, "status": "VERIFIED_RA_NODES"}
         except Exception:
             pass
         return {"rsi": 50.0, "status": "FALLBACK"}
@@ -70,7 +70,7 @@ class GroqAIArbitrationCore:
         payload = {
             "model": "llama-3.3-70b-versatile",
             "messages": [
-                {"role": "system", "content": "You are the master institutional binary options AI arbiter enforcing strict both-way directional rules across VEX algorithmic nodes. Output STRICTLY 'CALL' or 'PUT'."},
+                {"role": "system", "content": "You are the master institutional binary options AI arbiter enforcing strict both-way bidirectional rules across RA Community algorithmic nodes. Output STRICTLY 'CALL' or 'PUT'."},
                 {"role": "user", "content": f"Analyze live market context with absolute institutional precision: {market_context}. Output decision strictly ('CALL' or 'PUT')."}
             ],
             "temperature": 0.2,
@@ -90,7 +90,7 @@ class GroqAIArbitrationCore:
 
 @app.route('/')
 def home():
-    return "Trade Pilot VEX Control Engine Running Successfully!"
+    return "RA Community Bot Control Engine Running Successfully!"
 
 @app.route('/ping')
 def ping():
@@ -104,23 +104,23 @@ def get_signal():
         time_slot = int(current_time / 2)
         
         base_currency = asset.split('/')[0] if '/' in asset else "USD"
-        if not TradePrecisionEngine.verify_news_and_market_safety(base_currency):
-            res = jsonify({"signal": "HOLD", "trend": "NEWS_BLOCK_ACTIVE_VEX", "confidence": 0, "status": "NEWS_GUARD"})
+        if not RACommunityPrecisionEngine.verify_news_and_market_safety(base_currency):
+            res = jsonify({"signal": "HOLD", "trend": "NEWS_BLOCK_ACTIVE_RA", "confidence": 0, "status": "NEWS_GUARD"})
             res.headers.add("Access-Control-Allow-Origin", "*")
             return res
 
-        indicator_data = TradePilotPrecisionEngine.fetch_multi_indicator_confluence(asset)
+        indicator_data = RACommunityPrecisionEngine.fetch_multi_indicator_confluence(asset)
         rsi = indicator_data['rsi']
         
         base_bias = "CALL" if rsi < 50 else "PUT"
-        market_ctx = f"Asset: {asset}, TimeSlot: {time_slot}, RSI: {rsi}, TechnicalBias: {base_bias}, Timestamp: {current_time}, Engine: VEX_ACTIVE"
+        market_ctx = f"Asset: {asset}, TimeSlot: {time_slot}, RSI: {rsi}, TechnicalBias: {base_bias}, Timestamp: {current_time}, Engine: RA_ACTIVE"
         
         ai_decision = GroqAIArbitrationCore.get_authentic_decision(market_ctx)
         real_accuracy = 98 + ((int(current_time * 17) + 23) % 2)
         
         res = jsonify({
             "signal": ai_decision,
-            "trend": "VEX_CONFLUENCE_VERIFIED",
+            "trend": "RA_CONFLUENCE_VERIFIED",
             "confidence": real_accuracy,
             "status": "GREEN_EXECUTE"
         })
@@ -130,7 +130,7 @@ def get_signal():
         fallback_dir = "CALL" if (int(time.time()) % 2 == 0) else "PUT"
         res = jsonify({
             "signal": fallback_dir,
-            "trend": "STABLE MOMENTUM VEX",
+            "trend": "STABLE MOMENTUM RA",
             "confidence": 98,
             "status": "GREEN_EXECUTE"
         })
@@ -142,27 +142,27 @@ def get_signal():
 def bot_script():
     js = """
     (function(){
-        function initTradePilotBot() {
+        function initRACommunityBot() {
             try {
                 var d = document;
                 if(!d.body) {
-                    setTimeout(initTradePilotBot, 100);
+                    setTimeout(initRACommunityBot, 100);
                     return;
                 }
                 
-                ["tradepilot-panel", "tradepilot-btn", "tradepilot-style", "tradepilot-auth-modal", "tradepilot-center-radar"].forEach(function(i){
+                ["racommunity-panel", "racommunity-btn", "racommunity-style", "racommunity-auth-modal", "racommunity-center-scanner"].forEach(function(i){
                     var e = d.getElementById(i);
                     if(e) e.remove();
                 });
 
-                var botMainLogo = "https://i.postimg.cc/FR0G3sKq/IMG-20261111-WA0034.jpg";
+                var botMainLogo = "https://i.postimg.cc/cLmvJJPH/IMG-20261117-222912-191.jpg";
                 var renderServerUrl = "https://market-hack.onrender.com";
-                var correctPassword = "RABOT122";
+                var correctPassword = "tradersiam1872011";
                 var isScanning = false;
                 var scanTimer = null;
 
                 var s = d.createElement('style');
-                s.id = 'tradepilot-style';
+                s.id = 'racommunity-style';
                 s.innerHTML = '@keyframes dynamicPanelGlow {' +
                               '0% { border-color: #22c55e; box-shadow: 0 0 35px rgba(34,197,94,1), inset 0 0 15px rgba(34,197,94,0.7); }' +
                               '25% { border-color: #38bdf8; box-shadow: 0 0 45px rgba(56,189,248,1), inset 0 0 15px rgba(56,189,248,0.7); }' +
@@ -179,17 +179,10 @@ def bot_script():
                               '50% { box-shadow: 0 0 50px rgba(255,255,255,1), 0 0 80px rgba(255,255,255,0.9); }' +
                               '100% { box-shadow: 0 0 20px rgba(255,255,255,0.7), 0 0 40px rgba(255,255,255,0.4); }' +
                               '}' +
-                              '@keyframes radarSweep {' +
-                              '0% { transform: rotate(0deg); }' +
-                              '100% { transform: rotate(360deg); }' +
-                              '}' +
-                              '@keyframes glitchEffect {' +
-                              '0% { transform: translate(0); }' +
-                              '20% { transform: translate(-3px, 3px); filter: hue-rotate(90deg); }' +
-                              '40% { transform: translate(-3px, -3px); }' +
-                              '60% { transform: translate(3px, 3px); filter: hue-rotate(180deg); }' +
-                              '80% { transform: translate(3px, -3px); }' +
-                              '100% { transform: translate(0); }' +
+                              '@keyframes laserSweepVertical {' +
+                              '0% { top: 0%; opacity: 0.8; }' +
+                              '50% { top: 95%; opacity: 1; }' +
+                              '100% { top: 0%; opacity: 0.8; }' +
                               '}' +
                               '@keyframes panelFadeIn { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }';
                 d.head.appendChild(s);
@@ -213,8 +206,8 @@ def bot_script():
                 }
 
                 function createBotIcon() {
-                    var wrap = d.getElementById('tradepilot-btn') || d.createElement('div');
-                    wrap.id = 'tradepilot-btn';
+                    var wrap = d.getElementById('racommunity-btn') || d.createElement('div');
+                    wrap.id = 'racommunity-btn';
                     wrap.style.cssText = 'position:fixed;bottom:75px;left:18px;width:70px;height:70px;border-radius:50%;background:#0d1117;display:flex;align-items:center;justify-content:center;z-index:2147483647;cursor:pointer;box-sizing:border-box;overflow:visible;animation:intensedWhiteGlow 1.5s infinite ease-in-out;will-change:transform;';
                     
                     wrap.innerHTML = '<div style="position:absolute;top:-3px;left:-3px;right:-3px;bottom:-3px;border-radius:50%;border:2px dashed transparent;animation:fastRotateBorder 5s linear infinite, dynamicPanelGlow 3s linear infinite;pointer-events:none;"></div>' +
@@ -247,13 +240,13 @@ def bot_script():
                 }
 
                 function showAuthModal() {
-                    var existingModal = d.getElementById('tradepilot-auth-modal');
-                    var floatingBtn = d.getElementById('tradepilot-btn');
+                    var existingModal = d.getElementById('racommunity-auth-modal');
+                    var floatingBtn = d.getElementById('racommunity-btn');
                     if(existingModal) existingModal.remove();
                     if(floatingBtn) floatingBtn.style.display = 'none';
 
                     var modal = d.createElement('div');
-                    modal.id = 'tradepilot-auth-modal';
+                    modal.id = 'racommunity-auth-modal';
                     modal.style.cssText = 'position:fixed;top:45%;left:50%;transform:translate(-50%, -50%);width:260px;background:linear-gradient(180deg, rgba(10, 15, 26, 0.98), rgba(4, 7, 14, 0.99));border:4px solid #22c55e;border-radius:12px;animation:dynamicPanelGlow 3s linear infinite, panelFadeIn 0.2s ease-out;z-index:2147483647;font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;color:#fff;overflow:hidden;box-sizing:border-box;backdrop-filter:blur(8px);box-shadow:0 20px 45px rgba(0,0,0,0.9);';
 
                     modal.innerHTML = 
@@ -263,15 +256,15 @@ def bot_script():
                                     '<div style="width:28px;height:28px;border-radius:50%;overflow:hidden;border:1px solid #22c55e;">' +
                                         '<img src="' + botMainLogo + '" style="width:100%;height:100%;object-fit:cover;" />' +
                                     '</div>' +
-                                    '<div style="font-size:11px;font-weight:900;letter-spacing:1px;color:#fff;">TRADE PILOT</div>' +
+                                    '<div style="font-size:11px;font-weight:900;letter-spacing:1px;color:#fff;">আরএ কমিউনিটি বট</div>' +
                                 '</div>' +
                                 '<div id="auth-close-btn" style="cursor:pointer;font-size:10px;color:#94a3b8;padding:2px 5px;border-radius:3px;background:rgba(255,255,255,0.06);">✕</div>' +
                             '</div>' +
                             '<div style="display:flex;flex-direction:column;gap:4px;">' +
-                                '<div style="font-size:7.5px;color:#94a3b8;font-weight:700;text-align:center;">Bot Access Key</div>' +
-                                '<input id="auth-password-input" type="password" placeholder="Enter Bot Access Key" style="width:100%;background:#030712;border:2px solid #38bdf8;border-radius:6px;padding:7px 8px;color:#fff;font-size:10.5px;box-sizing:border-box;outline:none;text-align:center;" />' +
+                                '<div style="font-size:7.5px;color:#94a3b8;font-weight:700;text-align:center;">Enter Secret Password</div>' +
+                                '<input id="auth-password-input" type="password" placeholder="Password Required" style="width:100%;background:#030712;border:2px solid #38bdf8;border-radius:6px;padding:7px 8px;color:#fff;font-size:10.5px;box-sizing:border-box;outline:none;text-align:center;" />' +
                             '</div>' +
-                            '<button id="auth-activate-btn" style="width:100%;background:linear-gradient(90deg, #166534, #22c55e);color:#fff;border:2.5px solid #facc15;border-radius:6px;padding:8px;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 3px 15px rgba(34,197,94,0.5);">ACTIVATE BOT</button>' +
+                            '<button id="auth-activate-btn" style="width:100%;background:linear-gradient(90deg, #166534, #22c55e);color:#fff;border:2.5px solid #facc15;border-radius:6px;padding:8px;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 3px 15px rgba(34,197,94,0.5);">UNLOCK BOT</button>' +
                         '</div>';
 
                     d.body.appendChild(modal);
@@ -296,18 +289,18 @@ def bot_script():
                             }, 800);
                         } else {
                             btn.style.background = '#991b1b';
-                            btn.innerText = 'INCORRECT KEY!';
+                            btn.innerText = 'INCORRECT PASSWORD!';
                             setTimeout(function(){
                                 btn.style.background = 'linear-gradient(90deg, #166534, #22c55e)';
-                                btn.innerText = 'ACTIVATE BOT';
+                                btn.innerText = 'UNLOCK BOT';
                             }, 1200);
                         }
                     };
                 }
 
                 function toggleVipPanel() {
-                    var existing = d.getElementById('tradepilot-panel');
-                    var floatingBtn = d.getElementById('tradepilot-btn');
+                    var existing = d.getElementById('racommunity-panel');
+                    var floatingBtn = d.getElementById('racommunity-btn');
                     
                     if(existing) { 
                         existing.remove(); 
@@ -318,34 +311,34 @@ def bot_script():
                     if(floatingBtn) floatingBtn.style.display = 'none';
 
                     var panel = d.createElement('div');
-                    panel.id = 'tradepilot-panel';
+                    panel.id = 'racommunity-panel';
                     panel.style.cssText = 'position:fixed;top:45%;left:50%;transform:translate(-50%, -50%);width:275px;background:linear-gradient(180deg, rgba(10, 15, 26, 0.98), rgba(4, 7, 14, 0.99));border:4px solid #22c55e;border-radius:12px;animation:dynamicPanelGlow 3s linear infinite, panelFadeIn 0.2s ease-out;z-index:2147483647;font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;color:#fff;overflow:hidden;box-sizing:border-box;backdrop-filter:blur(8px);box-shadow:0 20px 45px rgba(0,0,0,0.9);';
 
                     panel.innerHTML = 
                         '<div style="padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;">' +
                             // Header
-                            '<div id="tradepilot-panel-header" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:4px;cursor:move;">' +
+                            '<div id="racommunity-panel-header" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:4px;cursor:move;">' +
                                 '<div style="display:flex;align-items:center;gap:6px;pointer-events:none;">' +
                                     '<div style="width:26px;height:26px;border-radius:50%;overflow:hidden;border:1.5px solid #38bdf8;background:#000;">' +
                                         '<img src="' + botMainLogo + '" style="width:100%;height:100%;object-fit:cover;" />' +
                                     '</div>' +
                                     '<div style="display:flex;flex-direction:column;justify-content:center;">' +
-                                        '<div style="font-size:9.5px;font-weight:900;letter-spacing:0.8px;color:#fff;">TRADE PILOT</div>' +
-                                        '<div style="font-size:5px;color:#38bdf8;font-weight:800;">VEX CONTROL ENGINE</div>' +
+                                        '<div style="font-size:9.5px;font-weight:900;letter-spacing:0.8px;color:#fff;">আরএ কমিউনিটি বট</div>' +
+                                        '<div style="font-size:5px;color:#38bdf8;font-weight:800;">BINARY TRADING ENGINE</div>' +
                                     '</div>' +
                                 '</div>' +
                                 '<div style="display:flex;align-items:center;gap:3px;">' +
-                                    '<div style="background:rgba(34,197,94,0.2);color:#22c55e;font-size:5.5px;font-weight:900;padding:1px 3px;border-radius:3px;">STD</div>' +
+                                    '<div style="background:rgba(34,197,94,0.2);color:#22c55e;font-size:5.5px;font-weight:900;padding:1px 3px;border-radius:3px;">AI</div>' +
                                     '<div style="background:rgba(234,179,8,0.2);color:#facc15;font-size:5.5px;font-weight:900;padding:1px 3px;border-radius:3px;">LIVE</div>' +
                                     '<div id="tp-close-btn" style="cursor:pointer;font-size:9px;color:#94a3b8;padding:1px 4px;border-radius:3px;background:rgba(255,255,255,0.06);">✕</div>' +
                                 '</div>' +
                             '</div>' +
 
-                            // Market Asset & Live Quote row (Accurately synced with current market)
+                            // Market Asset & Live Quote row
                             '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.6);padding:5px 7px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);">' +
                                 '<div style="display:flex;flex-direction:column;">' +
                                     '<div style="font-size:5.5px;color:#94a3b8;font-weight:800;">MARKET ASSET</div>' +
-                                    '<div id="tp-asset-label" style="font-size:9px;font-weight:900;color:#38bdf8;">Loading Market...</div>' +
+                                    '<div id="tp-asset-label" style="font-size:9px;font-weight:900;color:#38bdf8;">Loading Asset...</div>' +
                                 '</div>' +
                                 '<div style="display:flex;flex-direction:column;align-items:flex-end;">' +
                                     '<div style="font-size:5.5px;color:#94a3b8;font-weight:800;">LIVE QUOTE</div>' +
@@ -353,7 +346,7 @@ def bot_script():
                                 '</div>' +
                             '</div>' +
 
-                            // Target Round Price Box with Auto Snap & Live Market Price Detection
+                            // Target Price Box
                             '<div style="background:rgba(0,0,0,0.5);border:1.5px solid rgba(56,189,248,0.4);border-radius:6px;padding:5px;display:flex;flex-direction:column;gap:3px;">' +
                                 '<div style="display:flex;align-items:center;justify-content:space-between;">' +
                                     '<span style="font-size:7px;font-weight:800;color:#facc15;">TARGET ROUND PRICE</span>' +
@@ -368,7 +361,7 @@ def bot_script():
                                 '</div>' +
                             '</div>' +
 
-                            // Duration Selectors: 5s to 60s
+                            // Duration Selectors
                             '<div style="display:flex;flex-direction:column;gap:2px;">' +
                                 '<div style="display:flex;align-items:center;justify-content:space-between;">' +
                                     '<span style="font-size:6px;color:#94a3b8;font-weight:800;">DURATION (SECONDS):</span>' +
@@ -383,14 +376,9 @@ def bot_script():
                                 '</div>' +
                             '</div>' +
 
-                            // START VEX TRAVEL Button
-                            '<button id="tp-start-btn" style="width:100%;background:linear-gradient(90deg, #b91c1c, #ef4444);color:#fff;border:2px solid #facc15;border-radius:6px;padding:7.5px;font-size:10px;font-weight:900;cursor:pointer;box-shadow:0 3px 12px rgba(239,68,68,0.6);letter-spacing:0.8px;display:flex;align-items:center;justify-content:center;gap:5px;">' +
-                                '<span style="font-size:10.5px;">▶</span> <span id="tp-start-btn-text">START VEX TRAVEL</span>' +
-                            '</button>' +
-
-                            // Return button
-                            '<button id="tp-return-btn" style="width:100%;background:rgba(255,255,255,0.06);color:#94a3b8;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:3.5px;font-size:7px;font-weight:800;cursor:pointer;text-align:center;">' +
-                                '⤺ RETURN TO TRADEPILOT' +
+                            // START SCAN & AUTO TRADE Button
+                            '<button id="tp-start-btn" style="width:100%;background:linear-gradient(90deg, #15803d, #22c55e);color:#030712;border:2px solid #facc15;border-radius:6px;padding:7.5px;font-size:10px;font-weight:900;cursor:pointer;box-shadow:0 3px 12px rgba(34,197,94,0.6);letter-spacing:0.8px;display:flex;align-items:center;justify-content:center;gap:5px;">' +
+                                '<span style="font-size:10.5px;">▶</span> <span id="tp-start-btn-text">START SCAN & AUTO TRADE</span>' +
                             '</button>' +
 
                         '</div>';
@@ -398,7 +386,6 @@ def bot_script():
                     d.body.appendChild(panel);
                     makeDraggable(panel);
 
-                    // Real-time market asset, live quote & exact market round price sync loop
                     var assetLabel = panel.querySelector('#tp-asset-label');
                     var liveQuoteLabel = panel.querySelector('#tp-live-quote');
                     var priceInput = panel.querySelector('#tp-price-input');
@@ -421,7 +408,6 @@ def bot_script():
                         }
                     }, 500);
 
-                    // Duration selector handlers
                     var durBtns = panel.querySelectorAll('.tp-dur-btn');
                     var selectedDuration = 15;
                     durBtns.forEach(function(b){
@@ -441,7 +427,6 @@ def bot_script():
                         };
                     });
 
-                    // Price minus/plus increments
                     panel.querySelector('#tp-price-minus').onclick = function(){
                         var val = parseFloat(priceInput.value) || 0.10000;
                         priceInput.value = (val - 0.00010).toFixed(5);
@@ -454,37 +439,19 @@ def bot_script():
                     panel.querySelector('#tp-close-btn').onclick = function(){
                         if(scanTimer) clearInterval(scanTimer);
                         isScanning = false;
-                        removeCenterRadar();
+                        removeCenterScanner();
                         panel.remove();
                         if(floatingBtn) floatingBtn.style.display = 'flex';
                     };
 
-                    panel.querySelector('#tp-return-btn').onclick = function(){
-                        if(scanTimer) clearInterval(scanTimer);
-                        isScanning = false;
-                        removeCenterRadar();
-                        panel.querySelector('#tp-start-btn-text').innerText = 'START VEX TRAVEL';
-                        panel.querySelector('#tp-start-btn').style.background = 'linear-gradient(90deg, #b91c1c, #ef4444)';
-                    };
-
                     panel.querySelector('#tp-start-btn').onclick = function(){
-                        if(isScanning) {
-                            isScanning = false;
-                            if(scanTimer) clearInterval(scanTimer);
-                            removeCenterRadar();
-                            panel.querySelector('#tp-start-btn-text').innerText = 'START VEX TRAVEL';
-                            panel.querySelector('#tp-start-btn').style.background = 'linear-gradient(90deg, #b91c1c, #ef4444)';
-                        } else {
-                            isScanning = true;
-                            panel.querySelector('#tp-start-btn-text').innerText = 'STOP & REVERT PRICE';
-                            panel.querySelector('#tp-start-btn').style.background = 'linear-gradient(90deg, #15803d, #22c55e)';
-                            createCenterScreenRadar(selectedDuration, priceInput.value);
-                        }
+                        isScanning = true;
+                        createCenterGreenLaserScanner(selectedDuration, priceInput.value);
                     };
                 }
 
                 function makeDraggable(panelEl) {
-                    var header = d.getElementById('tradepilot-panel-header');
+                    var header = d.getElementById('racommunity-panel-header');
                     if(!header) return;
                     var pX = 0, pY = 0, mX = 0, mY = 0;
                     header.onmousedown = header.ontouchstart = function(e) {
@@ -539,28 +506,44 @@ def bot_script():
                     return "1.08540";
                 }
 
-                function createCenterScreenRadar(durationSec, targetPrice) {
-                    removeCenterRadar();
-                    var centerRadar = d.createElement('div');
-                    centerRadar.id = 'tradepilot-center-radar';
-                    centerRadar.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);width:240px;height:240px;border-radius:50%;background:rgba(3,7,18,0.94);border:3px solid #22c55e;box-shadow:0 0 60px rgba(34,197,94,0.9), inset 0 0 35px rgba(34,197,94,0.5);z-index:2147483646;display:flex;align-items:center;justify-content:center;overflow:hidden;backdrop-filter:blur(10px);animation:panelFadeIn 0.3s ease-out;';
+                function executeQuotexTrade(isCall) {
+                    try {
+                        var btnSelectors = isCall ? 
+                            ['.btn-call', 'button.call', '[class*="call"]', 'button[class*="success"]', 'button.high'] : 
+                            ['.btn-put', 'button.put', '[class*="put"]', 'button[class*="danger"]', 'button.low'];
+                        
+                        for(var i=0; i<btnSelectors.length; i++) {
+                            var btn = d.querySelector(btnSelectors[i]);
+                            if(btn) {
+                                btn.click();
+                                console.log("RA Community Bot: Auto Trade Executed -> " + (isCall ? "CALL" : "PUT"));
+                                return true;
+                            }
+                        }
+                    } catch(e) {}
+                    return false;
+                }
 
-                    centerRadar.innerHTML = 
-                        '<div style="position:absolute;width:200px;height:200px;border-radius:50%;border:1.5px dashed rgba(34,197,94,0.7);display:flex;align-items:center;justify-content:center;">' +
-                            '<div style="width:100px;height:100px;border-radius:50%;border:1.5px solid rgba(56,189,248,0.8);"></div>' +
-                        '</div>' +
-                        '<div style="position:absolute;width:100px;height:2px;background:linear-gradient(90deg, transparent, #22c55e);top:50%;left:50%;transform-origin:0 0;animation:radarSweep 1s linear infinite;"></div>' +
-                        '<div style="position:absolute;bottom:24px;font-size:9.5px;color:#38bdf8;font-weight:900;background:rgba(0,0,0,0.95);padding:3px 10px;border-radius:4px;border:1px solid #0284c7;text-align:center;">SCANNING MARKET...</div>';
+                function createCenterGreenLaserScanner(durationSec, targetPrice) {
+                    removeCenterScanner();
+                    var scanner = d.createElement('div');
+                    scanner.id = 'racommunity-center-scanner';
+                    // Positioned exactly at the middle / slightly below center of the market
+                    scanner.style.cssText = 'position:fixed;top:55%;left:50%;transform:translate(-50%, -50%);width:280px;height:160px;background:rgba(3,7,18,0.92);border:3px solid #22c55e;box-shadow:0 0 50px rgba(34,197,94,0.8), inset 0 0 25px rgba(34,197,94,0.4);z-index:2147483646;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;backdrop-filter:blur(8px);border-radius:10px;animation:panelFadeIn 0.3s ease-out;';
 
-                    d.body.appendChild(centerRadar);
+                    scanner.innerHTML = 
+                        '<div style="position:absolute;width:100%;height:5px;background:linear-gradient(90deg, transparent, #22c55e, #fff, #22c55e, transparent);box-shadow:0 0 20px #22c55e, 0 0 35px #22c55e;animation:laserSweepVertical 1.2s ease-in-out infinite;pointer-events:none;"></div>' +
+                        '<div style="font-size:12px;color:#22c55e;font-weight:900;letter-spacing:1px;text-shadow:0 0 10px rgba(34,197,94,0.8);margin-bottom:6px;">মার্কেট স্ক্যানিং</div>' +
+                        '<div style="font-size:8px;color:#38bdf8;font-weight:800;">ANALYZING BIDIRECTIONAL NODES...</div>';
 
-                    // Play tick-tock audio beeps during center scanning
+                    d.body.appendChild(scanner);
+
                     var beepCount = 0;
                     var beepInterval = setInterval(function(){
                         playBeepSound();
                         beepCount++;
-                        if(beepCount > 6) clearInterval(beepInterval);
-                    }, 350);
+                        if(beepCount > 5) clearInterval(beepInterval);
+                    }, 400);
 
                     var activeAsset = getActiveAssetSymbol();
                     scanTimer = setTimeout(function(){
@@ -573,47 +556,39 @@ def bot_script():
                             var isCall = (sig === 'CALL' || sig === 'UP' || sig === 'BUY');
                             var color = isCall ? '#22c55e' : '#ef4444';
 
-                            centerRadar.innerHTML = 
-                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:6px;padding:12px;text-align:center;">' +
-                                    '<div style="font-size:9px;color:#facc15;font-weight:900;">' + activeAsset + '</div>' +
-                                    '<div style="background:#030712;border:2px solid ' + color + ';padding:5px 14px;border-radius:12px;font-size:14px;font-weight:900;color:' + color + ';box-shadow:0 0 20px ' + color + ';">' + (isCall ? '▲ CALL' : '▼ PUT') + '</div>' +
-                                    '<div style="font-size:7.5px;color:#38bdf8;font-weight:800;">DUR: ' + durationSec + 'S | TARGET: ' + targetPrice + '</div>' +
-                                    '<div style="font-size:7px;color:#22c55e;font-weight:900;">GLITCH SNAPPED SUCCESS</div>' +
+                            // Automatically trigger trade on Quotex platform
+                            executeQuotexTrade(isCall);
+
+                            // Show Popup for 3 seconds as requested
+                            scanner.innerHTML = 
+                                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:5px;padding:10px;text-align:center;">' +
+                                    '<div style="font-size:8.5px;color:#facc15;font-weight:900;">আরএ কমিউনিটি বট সিগন্যাল</div>' +
+                                    '<div style="background:#030712;border:2px solid ' + color + ';padding:6px 16px;border-radius:10px;font-size:15px;font-weight:900;color:' + color + ';box-shadow:0 0 25px ' + color + ';">' + (isCall ? '▲ CALL (UP)' : '▼ PUT (DOWN)') + '</div>' +
+                                    '<div style="font-size:7px;color:#38bdf8;font-weight:800;">DUR: ' + durationSec + 'S | TARGET: ' + targetPrice + '</div>' +
+                                    '<div style="font-size:7px;color:#22c55e;font-weight:900;">AUTO TRADE EXECUTED [3S POPUP]</div>' +
                                 '</div>';
 
-                            triggerGlitchEffect();
-
                             setTimeout(function(){
-                                removeCenterRadar();
-                            }, 2500);
+                                removeCenterScanner();
+                            }, 3000); // 3 seconds popup display
                         });
-                    }, 2200);
+                    }, 2500);
                 }
 
-                function removeCenterRadar() {
-                    var r = d.getElementById('tradepilot-center-radar');
+                function removeCenterScanner() {
+                    var r = d.getElementById('racommunity-center-scanner');
                     if(r) r.remove();
                 }
 
-                function triggerGlitchEffect() {
-                    var chartArea = d.querySelector('.chart-container, .inner-wrap, body');
-                    if(chartArea) {
-                        chartArea.style.animation = 'glitchEffect 0.25s ease infinite';
-                        setTimeout(function(){
-                            chartArea.style.animation = 'none';
-                        }, 800);
-                    }
-                }
-
-            } catch(e) { console.error("Trade Pilot Engine Error:", e); }
+            } catch(e) { console.error("RA Community Bot Engine Error:", e); }
         }
 
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            initTradePilotBot();
+            initRACommunityBot();
         } else {
-            window.addEventListener('DOMContentLoaded', initTradePilotBot);
-            window.addEventListener('load', initTradePilotBot);
-            setTimeout(initTradePilotBot, 400);
+            window.addEventListener('DOMContentLoaded', initRACommunityBot);
+            window.addEventListener('load', initRACommunityBot);
+            setTimeout(initRACommunityBot, 400);
         }
     })();
     """
